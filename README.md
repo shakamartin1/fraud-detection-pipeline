@@ -124,7 +124,7 @@ aws s3 cp train_identity.csv s3://your-bucket/fraud-detection/raw/
 ## Author
 
 **Shukura Martin**
-Data Engineer | Data Scientist in Progress
-[LinkedIn](https://linkedin.com/in/yourprofile) | [GitHub](https://github.com/shakamartin1)
+Data Engineer | Data Scientist
+[LinkedIn](www.linkedin.com/in/shukuramms) | [GitHub](https://github.com/shakamartin1)
 
 > *This project is part of a 45-day focused upskilling sprint in data engineering, data science, and AI/ML.*
