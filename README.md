@@ -50,8 +50,8 @@ Tableau Dashboard — Fraud Pattern Visualization
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| Week 1 | Data ingestion, EDA, feature engineering | ✅ In Progress |
-| Week 2 | Statistical analysis, hypothesis testing | 🔲 Upcoming |
+| Week 1 | Data ingestion, EDA, feature engineering, statistical testing | ✅ Complete |
+| Week 2 | Advanced feature engineering, PCA prep | 🔄 In Progress |
 | Week 3 | Unsupervised learning — PCA + clustering | 🔲 Upcoming |
 | Week 4 | Supervised learning — fraud prediction model | 🔲 Upcoming |
 | Week 5 | AI integration — LLM insight generation | 🔲 Upcoming |
@@ -59,7 +59,7 @@ Tableau Dashboard — Fraud Pattern Visualization
 
 ---
 
-## Key Findings So Far
+## Key Findings
 
 ### Day 1 — EDA + Feature Engineering
 
@@ -72,7 +72,7 @@ Tableau Dashboard — Fraud Pattern Visualization
 - Fully anonymous transactions (all 4 identity fields missing) show **38.9% fraud rate** vs 2.65% baseline
 
 **Key Insight — Non-Linear Fraud Distribution**
-- identity_null_count follows a U-shaped fraud distribution, not linear
+- `identity_null_count` follows a U-shaped fraud distribution, not linear
 - 1 missing field = lowest fraud rate (1.7%) — the "sweet spot" sophisticated fraudsters exploit
 - 0 missing fields AND 4 missing fields are both high-risk for different reasons
 
@@ -80,6 +80,36 @@ Tableau Dashboard — Fraud Pattern Visualization
 - `is_addr_missing` — binary flag for missing address
 - `is_identity_complete` — all 4 identity fields present
 - `is_identity_empty` — all 4 identity fields missing
+- `is_mobile` — binary flag for mobile device
+- `has_identity` — binary flag for identity data presence
+
+---
+
+### Day 2 — Dataset Join + Statistical Hypothesis Testing
+
+**Dataset Join**
+- Merged `train_transaction.csv` (394 features) with `train_identity.csv` (41 features) on `TransactionID`
+- Only 21.2% of transactions have identity data attached — absence of identity data is itself a signal
+- Final merged dataset: 10,000 rows × 434 columns (sample)
+
+**Device Type Finding**
+- Mobile transactions show **8.5% fraud rate** vs **4.4% for desktop** — nearly 2x higher
+- Transactions without any identity data show **1.8% fraud rate** vs **5.9% with identity** — driven by mobile device tracking
+
+**Statistical Validation**
+
+| Test | Variable | Statistic | P-Value | Result |
+|------|----------|-----------|---------|--------|
+| Chi-Square | Address Missing vs Fraud | χ² = 224.42 | p ≈ 0.0 | ✅ Significant |
+| T-Test | Transaction Amount vs Fraud | t = 1.403 | p = 0.161 | ❌ Not Significant |
+| Chi-Square | Device Type vs Fraud | χ² = 14.40 | p = 0.00015 | ✅ Significant |
+
+**Key Statistical Insight**
+- Address missing and device type are statistically proven fraud signals
+- Transaction amount alone is NOT a reliable fraud predictor — a $18 average difference is statistically indistinguishable from noise
+- This means rule-based systems that flag high-value transactions will generate excessive false positives
+
+![Fraud Detection Day 2 Findings](fraud_findings_day2.png)
 
 ---
 
@@ -90,6 +120,7 @@ Tableau Dashboard — Fraud Pattern Visualization
 | Storage | AWS S3 |
 | Processing | AWS Glue, Python, pandas |
 | Query | AWS Athena |
+| Statistical Testing | scipy (chi-square, t-test) |
 | ML | scikit-learn, XGBoost |
 | Visualization | Tableau, matplotlib, seaborn |
 | AI Layer | Claude API / OpenAI API (Week 5) |
@@ -113,9 +144,9 @@ aws s3 cp train_identity.csv s3://your-bucket/fraud-detection/raw/
 
 ## What's Next
 
-- Join transaction + identity datasets
-- Statistical hypothesis testing on transaction amounts
+- Advanced feature engineering — transaction velocity, time-based features
 - PCA dimensionality reduction on 394 features
+- K-Means clustering to identify behavioral groups
 - XGBoost fraud prediction model
 - LLM-generated insight summaries
 
@@ -125,6 +156,6 @@ aws s3 cp train_identity.csv s3://your-bucket/fraud-detection/raw/
 
 **Shukura Martin**
 Data Engineer | Data Scientist
-[LinkedIn](www.linkedin.com/in/shukuramms) | [GitHub](https://github.com/shakamartin1)
+[LinkedIn](https://www.linkedin.com/in/shukuramms) | [GitHub](https://github.com/shakamartin1)
 
 > *This project is part of a 45-day focused upskilling sprint in data engineering, data science, and AI/ML.*
